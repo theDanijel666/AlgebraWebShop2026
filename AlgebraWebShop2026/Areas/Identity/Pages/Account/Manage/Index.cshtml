@@ -35,6 +35,21 @@
                 <label asp-for="Input.Adresa" class="form-label"></label>
                 <span asp-validation-for="Input.Adresa" class="text-danger"></span>
             </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Grad" class="form-control" placeholder="Unesite svoj grad." />
+                <label asp-for="Input.Grad" class="form-label"></label>
+                <span asp-validation-for="Input.Grad" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.PB" class="form-control" placeholder="Unesite svoj poštanski broj." />
+                <label asp-for="Input.PB" class="form-label"></label>
+                <span asp-validation-for="Input.PB" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Drzava" class="form-control" placeholder="Unesite svoju državu." />
+                <label asp-for="Input.Drzava" class="form-label"></label>
+                <span asp-validation-for="Input.Drzava" class="text-danger"></span>
+            </div>
 
             <button id="update-profile-button" type="submit" class="w-100 btn btn-lg btn-primary">Spremi</button>
         </form>

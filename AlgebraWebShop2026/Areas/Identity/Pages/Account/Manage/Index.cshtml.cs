@@ -59,10 +59,13 @@ public class IndexModel : PageModel
         [Phone]
         [Display(Name = "Phone number")]
         public string? PhoneNumber { get; set; }
-
+        
         public string? Ime { get; set; }
         public string? Prezime { get; set; }
         public string? Adresa { get; set; }
+        public string? Grad {  get; set; }
+        public string? PB { get; set; }
+        public string? Drzava { get; set; }
     }
 
     private async Task LoadAsync(ApplicationUser user)
@@ -77,7 +80,10 @@ public class IndexModel : PageModel
             PhoneNumber = phoneNumber,
             Ime=user.Ime ?? string.Empty,
             Prezime=user.Prezime ?? string.Empty,
-            Adresa=user.Adresa ?? string.Empty
+            Adresa=user.Adresa ?? string.Empty,
+            Grad=user.Grad ?? string.Empty,
+            PB=user.PB ?? string.Empty,
+            Drzava=user.Drzava ?? string.Empty
         };
     }
 
@@ -121,6 +127,9 @@ public class IndexModel : PageModel
         user.Ime = Input.Ime;
         user.Prezime = Input.Prezime;
         user.Adresa = Input.Adresa;
+        user.Grad=Input.Grad;
+        user.PB = Input.PB;
+        user.Drzava = Input.Drzava;
 
         await _userManager.UpdateAsync(user);
 

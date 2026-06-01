@@ -17,5 +17,8 @@ namespace AlgebraWebShop2026.Models
 
         [ForeignKey(nameof(ParentCathegoryId))]
         public Category ParentCategory { get; set; }
+
+        [ForeignKey("CategoryId")]
+        public virtual ICollection<ProductCategory> ProductCategories { get; set; }
     }
 }
