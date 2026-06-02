@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AlgebraWebShop2026.Models
@@ -24,9 +25,11 @@ namespace AlgebraWebShop2026.Models
 
         [Required]
         [StringLength(200,MinimumLength =2)]
+        [DisplayName("Mesuring unit")]
         public string MesuringUnit { get; set; }
 
         [Column(TypeName = "decimal(9,2)")]
+        [DisplayName("Discount %")]
         public decimal Discount { get; set; } = 0;
 
         [ForeignKey("ProductId")]
