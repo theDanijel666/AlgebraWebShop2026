@@ -19,10 +19,17 @@ public class ProductController : Controller
     // GET: PRODUCTS
     public async Task<IActionResult> Index()    
     {
-        var products = await _context.Product.
-            Include(p=>p.Images).
-            Include(p=>p.ProductCategories).
-            ToListAsync();
+        var products = _context.Product.
+            Include(p => p.Images).
+            Include(p => p.ProductCategories).
+            ToList();
+        foreach (var product in products) 
+        {
+            foreach(var category in product.ProductCategories)
+            {
+                category.CategoryTitle = _context.Category.Find(category.CategoryId).Title;
+            }
+        }
         return View(products);
     }
 
@@ -45,8 +52,17 @@ public class ProductController : Controller
     }
 
     // GET: PRODUCTS/Create
-    public IActionResult Create()
+    public IActionResult Create(int productId)
     {
+        if (productId <= 0) return RedirectToAction("Index", "Product");
+        var product = _context.Product.Where(p => p.Id == productId).FirstOrDefault();
+        if (product == null)
+        {
+            return NotFound();
+        }
+
+        ViewBag.ProductId = productId;
+
         return View();
     }
 
@@ -57,6 +73,9 @@ public class ProductController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("Id,Title,Description,Quantity,Price,MesuringUnit,Discount,ProductCategories,Images,OrderItems")] Product product)
     {
+        ModelState.Remove("ProductCategories");
+        ModelState.Remove("Images");
+        ModelState.Remove("OrderItems");
         if (ModelState.IsValid)
         {
             _context.Add(product);

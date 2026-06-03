@@ -70,7 +70,19 @@
                 @Html.DisplayFor(model => item.Discount)
             </td>
             <td>
-                @Html.DisplayFor(model => item.ProductCategories)
+                @* @Html.DisplayFor(model => item.ProductCategories) *@
+                    @if(item.ProductCategories.Count>0){
+                        string categories ="";
+                        foreach(var category in item.ProductCategories)
+                        {
+                            categories += category.CategoryTitle + ", ";
+                        }
+
+                        categories= categories.Substring(0, categories.Length - 2);
+
+                        @categories
+                    }
+                    
             </td>
             @* <td>
                 @Html.DisplayFor(model => item.Images)
@@ -82,8 +94,8 @@
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
-                <a asp-controller="ProductCategory" asp-action="Index" asp-route-id="@item.Id"> Categories </a>
-                <a asp-controller="Image" asp-action="Index" asp-route-id="@item.Id"> Manage images </a>
+                <a asp-controller="ProductCategory" asp-action="Index" asp-route-productId="@item.Id"> Categories </a> | 
+                <a asp-controller="Image" asp-action="Index" asp-route-productId="@item.Id"> Manage images </a>
             </td>
         </tr>
 }
