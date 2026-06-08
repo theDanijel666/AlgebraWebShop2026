@@ -3,6 +3,7 @@ using AlgebraWebShop2026.Data;
 using AlgebraWebShop2026.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
@@ -82,9 +83,20 @@ public class ImageController : Controller
                 return View(image);
             }
 
+            string filename = image.ProductId.ToString()+DateTime.Now.Ticks.ToString()+file.FileName;
+
+            string saveLocation = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Media", "Images", filename);
+
+            var fileStream = new FileStream(saveLocation, FileMode.Create);
+            file.CopyTo(fileStream);
+            fileStream.Flush();
+            fileStream.Close();
+
+            image.URL = "/Media/Images/" + filename;
+
             _context.Add(image);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index),new {productId=image.ProductId});
         }
         return View(image);
     }
@@ -110,7 +122,7 @@ public class ImageController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("Id,IsMain,Title,Description,URL,ProductId")] Image image)
+    public async Task<IActionResult> Edit(int? id, [Bind("Id,IsMain,Title,Description,URL,ProductId")] Image image, IFormFile file)
     {
         if (id != image.Id)
         {
@@ -121,6 +133,35 @@ public class ImageController : Controller
         {
             try
             {
+                if (file.Length > 0)
+                {
+                    string extension=System.IO.Path.GetExtension(file.FileName).ToLower();
+                    if(extension==".jpg" || extension==".jpeg" || extension==".png")
+                    {
+                        string filename = image.ProductId.ToString() + DateTime.Now.Ticks.ToString() + file.FileName;
+
+                        string savelocation = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "Media", "Images", filename);
+                        var fileStream=new FileStream(savelocation,FileMode.Create);
+                        file.CopyTo(fileStream);
+                        fileStream.Flush();
+                        fileStream.Close();
+
+                        string newURL = "/Media/Images/" + filename;
+
+                        string oldfile = image.URL;
+                        oldfile = oldfile.Remove(0, 1).Replace("/", "\\\\");
+                        oldfile = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", oldfile);
+                        if (System.IO.File.Exists(oldfile)) System.IO.File.Delete(oldfile);
+
+                        image.URL = newURL;
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("URL", "File format not supported!");
+                        return View(image);
+                    }
+                }
+
                 _context.Update(image);
                 await _context.SaveChangesAsync();
             }
@@ -135,7 +176,7 @@ public class ImageController : Controller
                     throw;
                 }
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index),new {produtId=image.ProductId});
         }
         return View(image);
     }
@@ -164,13 +205,26 @@ public class ImageController : Controller
     public async Task<IActionResult> DeleteConfirmed(int? id)
     {
         var image = await _context.Image.FindAsync(id);
+        string file = "";
+        int productId = 0;
         if (image != null)
         {
+            file = image.URL;
+            productId=image.ProductId;
             _context.Image.Remove(image);
+        }
+        else
+        {
+            return RedirectToAction("Index", "Product");
         }
 
         await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
+
+        file = file.Remove(0, 1).Replace("/", "\\\\");
+        file = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", file);
+        if (System.IO.File.Exists(file)) System.IO.File.Delete(file);
+
+        return RedirectToAction(nameof(Index),new {productId=productId});
     }
 
     private bool ImageExists(int? id)

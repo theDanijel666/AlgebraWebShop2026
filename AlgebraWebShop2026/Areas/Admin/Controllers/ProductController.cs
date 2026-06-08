@@ -48,21 +48,19 @@ public class ProductController : Controller
             return NotFound();
         }
 
+        product.Images = await _context.Image.Where(i => i.ProductId == id).ToListAsync();
+        product.ProductCategories = await _context.ProductCategory.Where(pc => pc.ProductId == id).ToListAsync();
+        foreach (var category in product.ProductCategories)
+        {
+            category.CategoryTitle = _context.Category.Where(c => c.Id == category.CategoryId).First().Title;
+        }
+
         return View(product);
     }
 
     // GET: PRODUCTS/Create
-    public IActionResult Create(int productId)
+    public IActionResult Create()
     {
-        if (productId <= 0) return RedirectToAction("Index", "Product");
-        var product = _context.Product.Where(p => p.Id == productId).FirstOrDefault();
-        if (product == null)
-        {
-            return NotFound();
-        }
-
-        ViewBag.ProductId = productId;
-
         return View();
     }
 
@@ -98,6 +96,14 @@ public class ProductController : Controller
         {
             return NotFound();
         }
+
+        product.Images = await _context.Image.Where(i => i.ProductId == id).ToListAsync();
+        product.ProductCategories = await _context.ProductCategory.Where(pc => pc.ProductId == id).ToListAsync();
+        foreach (var category in product.ProductCategories)
+        {
+            category.CategoryTitle = _context.Category.Where(c => c.Id == category.CategoryId).First().Title;
+        }
+
         return View(product);
     }
 
@@ -112,6 +118,10 @@ public class ProductController : Controller
         {
             return NotFound();
         }
+
+        ModelState.Remove("OrderItems");
+        ModelState.Remove("Images");
+        ModelState.Remove("ProductCategories");
 
         if (ModelState.IsValid)
         {
@@ -151,6 +161,13 @@ public class ProductController : Controller
             return NotFound();
         }
 
+        product.Images = await _context.Image.Where(i => i.ProductId == id).ToListAsync();
+        product.ProductCategories = await _context.ProductCategory.Where(pc => pc.ProductId == id).ToListAsync();
+        foreach (var category in product.ProductCategories)
+        {
+            category.CategoryTitle = _context.Category.Where(c => c.Id == category.CategoryId).First().Title;
+        }
+
         return View(product);
     }
 
@@ -160,12 +177,26 @@ public class ProductController : Controller
     public async Task<IActionResult> DeleteConfirmed(int? id)
     {
         var product = await _context.Product.FindAsync(id);
+        List<string> files = new List<string>();
         if (product != null)
         {
+            product.Images = await _context.Image.Where(i => i.ProductId == id).ToListAsync();
+            foreach(var image in product.Images)
+            {
+                files.Add(image.URL);
+            }
             _context.Product.Remove(product);
         }
 
         await _context.SaveChangesAsync();
+
+        foreach (var file in files)
+        {
+            string todelete = file.Remove(0, 1).Replace("/", "\\\\");
+            todelete = System.IO.Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", todelete);
+            if(System.IO.File.Exists(todelete)) System.IO.File.Delete(todelete);
+        }
+
         return RedirectToAction(nameof(Index));
     }
 

@@ -17,6 +17,7 @@
             @Html.DisplayFor(model => model.Title)
         </dd>
     </dl>
+    <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
@@ -24,6 +25,7 @@
             @Html.DisplayFor(model => model.Description)
         </dd>
     </dl>
+    <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Quantity)
         </dt>
@@ -31,6 +33,7 @@
             @Html.DisplayFor(model => model.Quantity)
         </dd>
     </dl>
+    <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Price)
         </dt>
@@ -38,6 +41,7 @@
             @Html.DisplayFor(model => model.Price)
         </dd>
     </dl>
+    <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.MesuringUnit)
         </dt>
@@ -45,6 +49,7 @@
             @Html.DisplayFor(model => model.MesuringUnit)
         </dd>
     </dl>
+    <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Discount)
         </dt>
@@ -52,25 +57,40 @@
             @Html.DisplayFor(model => model.Discount)
         </dd>
     </dl>
+    <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.ProductCategories)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductCategories)
+            @* @Html.DisplayFor(model => model.ProductCategories) *@
+            @{
+                string pc = "";
+                foreach(var category in Model.ProductCategories)
+                {
+                    pc += category.CategoryTitle + ", ";
+                }
+                pc = pc.Substring(0, pc.Length - 2);
+            }
+            <label>@pc</label>
         </dd>
     </dl>
+    <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Images)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Images)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OrderItems)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OrderItems)
+            @if (Model.Images.Count < 1)
+            {
+                <img src="~/Media/No_image.png" width="200" />
+            }
+            else
+            {
+                foreach(var img in Model.Images)
+                {
+                    <img src="@img.URL" alt="@img.Title" width="200" />                     
+                    @: &nbsp; &nbsp;
+                }
+            }
         </dd>
     </dl>
 </div>

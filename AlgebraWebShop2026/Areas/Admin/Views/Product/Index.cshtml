@@ -52,8 +52,22 @@
                 @Html.DisplayFor(model => item.Title)
             </td>
             <td>
-                image
-            </td>
+                    @if (item.Images.Count > 0)
+                    {
+                        string imageurl="";
+                        var img = item.Images.Where(i => i.IsMain).FirstOrDefault();
+                        if (img != null) imageurl = img.URL;
+                        else
+                        {
+                            imageurl = item.Images.FirstOrDefault().URL;
+                        }
+                        <img src="@imageurl" width="100" />
+                    }
+                    else
+                    {
+                        <img src="/Media/No_image.png" width="100" />
+                    }
+                </td>
             <td>
                 @Html.DisplayFor(model => item.Description)
             </td>

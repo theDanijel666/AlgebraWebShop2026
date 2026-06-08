@@ -17,6 +17,7 @@
             @Html.DisplayFor(model => model.IsMain)
         </dd>
     </dl>
+    <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Title)
         </dt>
@@ -24,6 +25,7 @@
             @Html.DisplayFor(model => model.Title)
         </dd>
     </dl>
+    <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Description)
         </dt>
@@ -31,22 +33,18 @@
             @Html.DisplayFor(model => model.Description)
         </dd>
     </dl>
+    <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.URL)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.URL)
-        </dd>
-    </dl>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ProductId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ProductId)
+            @* @Html.DisplayFor(model => model.URL) <br />
+            <br /> *@
+            <img src="@Model.URL" alt="@Model.Title" />
         </dd>
     </dl>
 </div>
 <div>
     <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index" asp-route-productId="@Model.ProductId">Back to List</a>
 </div>
