@@ -102,13 +102,46 @@ namespace AlgebraWebShop2026.Controllers
 
         public IActionResult RemoveFromCart(int productId)
         {
-            throw new NotImplementedException();
+            List<CartItem> cart = HttpContext.Session.GetObjectFromJson<List<CartItem>>(SessionKeyName)
+                ?? new List<CartItem>();
+            int product_index=IsExistingInCart(productId);
+
+            if(product_index>=0) cart.RemoveAt(product_index);
+
+            HttpContext.Session.SetObjectAsJson(SessionKeyName, cart);
+
+            return RedirectToAction(nameof(Index));
         }
 
         [HttpPost]
         public IActionResult UpdateQuantity(int productId,decimal quantity)
         {
-            throw new NotImplementedException();
+            List<CartItem> cart = HttpContext.Session.GetObjectFromJson<List<CartItem>>(SessionKeyName);
+            int product_index = IsExistingInCart(productId);
+            if(product_index<0) return RedirectToAction(nameof(Index),new {message="Updated product not in cart!"});
+            string msg = "";
+
+            if (quantity < 0)
+            {
+                msg = "Quantity can't be negative!";
+            }
+            else
+            {
+                decimal available_quanity = _context.Product.Find(productId).Quantity;
+                if (available_quanity < quantity){
+                    msg = "Quantity set to available quantity. ";
+                    quantity = available_quanity;
+                }
+                cart[product_index].Quantity = quantity;
+                if (quantity == 0)
+                {
+                    cart.RemoveAt(product_index);
+                    msg += "Quantity is 0, so product is removed from cart.";
+                }
+                HttpContext.Session.SetObjectAsJson(SessionKeyName, cart);
+            }
+
+            return RedirectToAction(nameof(Index),new {message=msg});
         }
 
         private int IsExistingInCart(int productId)

@@ -24,6 +24,12 @@ else
             <tr>
                 <th></th>
                 <th>Product</th>
+                <th></th>
+                <th>Price</th>
+                <th>Discount</th>
+                <th>Unit of mesurment</th>
+                <th>Quantity</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
@@ -38,8 +44,59 @@ else
                         <a asp-controller="Home" asp-action="SingleProduct" 
                         asp-route-id="@item.Product.Id" style="text-decoration:none"> @item.Product.Title </a>
                     </td>
+                    <td>
+                        @{
+                            string imgurl = "/Media/No_image.png";
+                            if (item.Product.Images.Count > 0)
+                            {
+                                var img = item.Product.Images.Where(img => img.IsMain).FirstOrDefault();
+                                if (img != null) imgurl = img.URL;
+                                else
+                                {
+                                    imgurl = item.Product.Images.First().URL;
+                                }
+                            }
+                        }
+                        <a asp-controller="Home" asp-action="SingleProduct"
+                           asp-route-id="@item.Product.Id" style="text-decoration:none"> 
+                            <img src="@imgurl" width="80" /> 
+                        </a>
+                    </td>
+                    <td>
+                        @item.Product.Price.ToString("0.00") €
+                    </td>
+                    <td>
+                        @item.Product.Discount.ToString("0.00") %
+                    </td>
+                    <td>
+                        @item.Product.MesuringUnit
+                    </td>
+                    <td>
+                        <form method="post" asp-action="UpdateQuantity">
+                            <input type="hidden" name="productId" value="@item.Product.Id" />
+                            <input type="number" name="quantity" title="quantity" value="@item.Quantity.ToString("0")" />
+                            <input type="submit" class="btn btn-success btn-sm" value="Update" />
+                        </form>
+                    </td>
+                    <td>
+                        @item.getTotal().ToString("0.00") €
+                    </td>
                 </tr>
             }
+            <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td><b>Total price:</b></td>
+                <td><b>@ViewBag.TotalPrice.ToString("0.00") €</b></td>
+            </tr>
         </tbody>
     </table>
+
+    <hr />
+    <a class="btn btn-primary btn-lg float-start" asp-controller="Home" asp-action="Product">Continue shopping</a>
+    <a class="btn btn-success btn-lg float-end" asp-controller="Home" asp-action="Order">Order products</a>
 }
