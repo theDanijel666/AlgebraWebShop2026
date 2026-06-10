@@ -42,12 +42,12 @@ namespace AlgebraWebShop2026.Controllers
                 ?? new List<CartItem>();
             string msg = "";
 
+            var product = _context.Product.Find(productId);
+            if (product == null) return RedirectToAction(nameof(Index),
+                new { message = "Can't add non existing product to cart!" });
+
             if (cart.Count == 0)
             {
-                var product = _context.Product.Find(productId);
-                if(product==null) return RedirectToAction(nameof(Index),
-                    new { message = "Can't add non existing product to cart!" });
-
                 CartItem cartItem = new CartItem()
                 {
                     Product = product,
@@ -62,10 +62,40 @@ namespace AlgebraWebShop2026.Controllers
 
                 cart.Add(cartItem);
                 msg += cartItem.Product.Title + " added to cart";
-                HttpContext.Session.SetObjectAsJson(SessionKeyName, cart);
+            }
+            else
+            {
+                int product_index = IsExistingInCart(productId);
+                if (product_index < 0)
+                {
+                    CartItem cartItem = new CartItem()
+                    {
+                        Product = product,
+                        Quantity = quantity
+                    };
+
+                    if (product.Quantity < cartItem.Quantity)
+                    {
+                        cartItem.Quantity = product.Quantity;
+                        msg = "With available quantity, ";
+                    }
+
+                    cart.Add(cartItem);
+                    msg += cartItem.Product.Title + " added to cart";
+                }
+                else
+                {
+                    cart[product_index].Quantity += quantity;
+                    msg = "Quantity updated.";
+                    if (product.Quantity < cart[product_index].Quantity)
+                    {
+                        cart[product_index].Quantity = product.Quantity;
+                        msg = "Quantity set to available quantity!";
+                    }
+                }
             }
 
-
+            HttpContext.Session.SetObjectAsJson(SessionKeyName, cart);
 
             return RedirectToAction(nameof(Index), new { message = msg });
         }
@@ -83,7 +113,13 @@ namespace AlgebraWebShop2026.Controllers
 
         private int IsExistingInCart(int productId)
         {
-            throw new NotImplementedException();
+            List<CartItem> cart = HttpContext.Session.GetObjectFromJson<List<CartItem>>(SessionKeyName);
+            for(int i = 0; i < cart.Count; i++)
+            {
+                if (cart[i].Product.Id == productId) return i;
+            }
+
+            return -1;
         }
     }
 }

@@ -1,0 +1,45 @@
+﻿@using AlgebraWebShop2026.Extensions
+@model List<CartItem>
+@{
+    ViewData["Title"] = "Cart";
+}
+
+@ViewBag.Cart
+
+@if (Model.Count == 0)
+{
+    <div class="text-center">
+        <h1 class="display-4"> Your cart is empty! </h1>
+        <hr>
+        <a asp-controller="Home" asp-action="Product"> Continue shopping :)</a>
+    </div>
+}
+else
+{
+    <div class="text-center">
+        <h1 class="display-4"> Cart items </h1>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Product</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var item in Model)
+            {
+                <tr>
+                    <td>
+                        <a class="btn btn-sm btn-danger" asp-action="RemoveFromCart" 
+                            asp-route-productId="@item.Product.Id">Remove</a>
+                    </td>
+                    <td>
+                        <a asp-controller="Home" asp-action="SingleProduct" 
+                        asp-route-id="@item.Product.Id" style="text-decoration:none"> @item.Product.Title </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
