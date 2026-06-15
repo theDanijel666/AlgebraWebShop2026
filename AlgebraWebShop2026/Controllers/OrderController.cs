@@ -1,8 +1,10 @@
 ﻿using AlgebraWebShop2026.Data;
 using AlgebraWebShop2026.Extensions;
 using AlgebraWebShop2026.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AlgebraWebShop2026.Controllers
 {
@@ -48,9 +50,9 @@ namespace AlgebraWebShop2026.Controllers
 
             ViewBag.Errors = errors;
 
-            Order order = new Order();
+            Order order = HttpContext.Session.GetObjectFromJson<Order>("OrderDetails") ?? new Order();
 
-            if (_signInManager.IsSignedIn(User))
+            if (_signInManager.IsSignedIn(User) && order.BillingFirstname=="")
             {
                 var userid = _userManager.GetUserId(User);
                 order.UserId = userid;
@@ -77,11 +79,107 @@ namespace AlgebraWebShop2026.Controllers
             "ShippingFirstname, ShippingLastname, ShippingEmail, ShippingPhone, ShippingAddress," +
             "ShippingCity, ShippingZIP, ShippingCountry, Message")] Order order, string ShippingSameAsBilling)
         {
+            HttpContext.Session.SetObjectAsJson("OrderDetails", order);
             var modelErrors = new List<string>();
 
+            string msg = CheckCart();
+            if (msg != "OK")
+            {
+                msg = "Cart: " + msg;
+                modelErrors.Add(msg);
+            }
 
+            List<CartItem> cart = HttpContext.Session.GetObjectFromJson<List<CartItem>>(SessionKeyName) 
+                ?? new List<CartItem>();
+            if (cart.Count == 0)
+            {
+                return RedirectToAction(nameof(Order), new { errors = modelErrors });
+            }
 
-            ViewBag.Order = order;
+            ModelState.Remove("OrderItems");
+            ModelState.Remove("ShippingSameAsBilling");
+            if (order.Message.IsNullOrEmpty()) order.Message = "";
+            ModelState.Remove("Message");
+
+            if (_signInManager.IsSignedIn(User))
+            {
+                var userid = _userManager.GetUserId(User);
+                order.UserId = userid;
+                ModelState.Remove("UserId");
+            }
+            else
+            {
+                modelErrors.Add("User: You have to be signed in to make an order!");
+                return RedirectToAction(nameof(Order), new { errors = modelErrors });
+            }
+
+            if (ShippingSameAsBilling == "on")
+            {
+                order.ShippingFirstname = order.BillingFirstname;
+                ModelState.Remove("ShippingFirstname");
+                order.ShippingLastname = order.BillingLastname;
+                ModelState.Remove("ShippingLastname");
+                order.ShippingEmail = order.BillingEmail;
+                ModelState.Remove("ShippingEmail");
+                order.ShippingPhone = order.BillingPhone;
+                ModelState.Remove("ShippingPhone");
+                order.ShippingAddress = order.BillingAddress;
+                ModelState.Remove("ShippingAddress");
+                order.ShippingCity = order.BillingCity;
+                ModelState.Remove("ShippingCity");
+                order.ShippingZIP = order.BillingZIP;
+                ModelState.Remove("ShippingZIP");
+                order.ShippingCountry = order.BillingCountry;
+                ModelState.Remove("ShippingCountry");
+                HttpContext.Session.SetObjectAsJson("OrderDetails", order);
+            }
+
+            if(ModelState.IsValid && modelErrors.Count == 0)
+            {
+                int orderNum = _context.Order.Max(o => o.OrderNumber)+1;
+                order.OrderNumber= orderNum;
+                order.Created= DateTime.Now;
+                _context.Order.Add(order);
+                _context.SaveChanges();
+
+                int order_id = order.Id;
+
+                foreach(var item in cart)
+                {
+                    OrderItem oi = new OrderItem()
+                    {
+                        OrderId = order_id,
+                        ProductId = item.Product.Id,
+                        Quantity = item.Quantity,
+                        Price = item.Product.Price,
+                        MesuringUnit= item.Product.MesuringUnit,
+                        Discount= item.Product.Discount,
+                    };
+
+                    var prod = _context.Product.Find(oi.ProductId);
+                    prod.Quantity -= oi.Quantity;
+                    _context.Update(prod);
+
+                    _context.OrderItem.Add(oi);
+                    _context.SaveChanges();
+                }
+
+                HttpContext.Session.SetObjectAsJson(SessionKeyName, "");
+                HttpContext.Session.SetObjectAsJson("OrderDetails", "");
+
+                return RedirectToAction(nameof(Index), "Home", new { message = "Thank you for your order :)" });
+            }
+            else
+            {
+                foreach(var modelState in ModelState.Values)
+                {
+                    foreach(var error in modelState.Errors)
+                    {
+                        modelErrors.Add(error.ErrorMessage);
+                    }
+                }
+            }
+
             return RedirectToAction(nameof(Order), new { errors = modelErrors });
         }
 
@@ -110,6 +208,33 @@ namespace AlgebraWebShop2026.Controllers
             }
 
             return "OK";
+        }
+
+        [Authorize]
+        public IActionResult MyOrders()
+        {
+            var user_id = _userManager.GetUserId(User);
+            var orders=_context.Order.Where(o=>o.UserId == user_id);
+            return View(orders);
+        }
+
+        [Authorize]
+        public IActionResult MyOrderDetails(int id)
+        {
+            var order=_context.Order.Where(o=>o.Id == id).FirstOrDefault();
+            if (order == null) return NotFound();
+
+            var user_id=_userManager.GetUserId(User);
+
+            if (order.UserId != user_id)
+            {
+                return RedirectToAction("Index", "Home", 
+                    new { message = "Not allowed to view orders you did not make!" });
+            }
+
+            order.OrderItems=_context.OrderItem.Where(o=>o.OrderId==order.Id).ToList();
+
+            return View(order);
         }
     }
 }
