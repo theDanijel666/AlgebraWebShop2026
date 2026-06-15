@@ -1,5 +1,6 @@
 ﻿using AlgebraWebShop2026.Data;
 using AlgebraWebShop2026.Extensions;
+using AlgebraWebShop2026.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,7 +20,7 @@ namespace AlgebraWebShop2026.Controllers
             _signInManager = signInManager;
         }
 
-        public IActionResult Order(List<string> errors)
+        public async Task<IActionResult> Order(List<string> errors)
         {
             if (errors == null) errors = new List<string>();
             string msg = CheckCart();
@@ -47,7 +48,41 @@ namespace AlgebraWebShop2026.Controllers
 
             ViewBag.Errors = errors;
 
+            Order order = new Order();
+
+            if (_signInManager.IsSignedIn(User))
+            {
+                var userid = _userManager.GetUserId(User);
+                order.UserId = userid;
+                var user=await _userManager.GetUserAsync(User);
+                order.BillingFirstname = user.Ime;
+                order.BillingLastname = user.Prezime;
+                order.BillingEmail = user.Email;
+                order.BillingPhone = user.PhoneNumber;
+                order.BillingAddress = user.Adresa;
+                order.BillingCity = user.Grad;
+                order.BillingCountry = user.Drzava;
+                order.BillingZIP = user.PB;
+            }
+
+            ViewBag.Order = order;
+
             return View(cart);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateOrder([Bind("Total, BillingFirstname,BillingLastname," +
+            "BillingEmail, BillingPhone, BillingAddress, BillingCity, BillingZIP, BillingCountry," +
+            "ShippingFirstname, ShippingLastname, ShippingEmail, ShippingPhone, ShippingAddress," +
+            "ShippingCity, ShippingZIP, ShippingCountry, Message")] Order order, string ShippingSameAsBilling)
+        {
+            var modelErrors = new List<string>();
+
+
+
+            ViewBag.Order = order;
+            return RedirectToAction(nameof(Order), new { errors = modelErrors });
         }
 
         private string CheckCart()
