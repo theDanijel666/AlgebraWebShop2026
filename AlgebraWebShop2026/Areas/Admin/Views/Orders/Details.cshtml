@@ -1,0 +1,109 @@
+@using Microsoft.AspNetCore.Identity
+@model AlgebraWebShop2026.Models.Order
+
+@inject UserManager<AlgebraWebShop2026.Data.ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Order no. @Model.OrderNumber</h4>
+    <hr />
+    <h6>Billing info: </h6>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"> @Html.DisplayNameFor(model => model.BillingFirstname) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.BillingLastname) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.BillingEmail) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.BillingPhone) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.BillingAddress) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.BillingCity) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.BillingZIP) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.BillingCountry) </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Html.DisplayFor(model => model.BillingFirstname)</td>
+                <td>@Html.DisplayFor(model => model.BillingLastname)</td>
+                <td>@Html.DisplayFor(model => model.BillingEmail)</td>
+                <td>@Html.DisplayFor(model => model.BillingPhone)</td>
+                <td>@Html.DisplayFor(model => model.BillingAddress)</td>
+                <td>@Html.DisplayFor(model => model.BillingCity)</td>
+                <td>@Html.DisplayFor(model => model.BillingZIP)</td>
+                <td>@Html.DisplayFor(model => model.BillingCountry)</td>
+            </tr>
+        </tbody>
+    </table>
+    <br />
+    <h6>Shipping info: </h6>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col"> @Html.DisplayNameFor(model => model.ShippingFirstname) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.ShippingLastname) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.ShippingEmail) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.ShippingPhone) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.ShippingAddress) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.ShippingCity) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.ShippingZIP) </th>
+                <th scope="col"> @Html.DisplayNameFor(model => model.ShippingCountry) </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@Html.DisplayFor(model => model.ShippingFirstname)</td>
+                <td>@Html.DisplayFor(model => model.ShippingLastname)</td>
+                <td>@Html.DisplayFor(model => model.ShippingEmail)</td>
+                <td>@Html.DisplayFor(model => model.ShippingPhone)</td>
+                <td>@Html.DisplayFor(model => model.ShippingAddress)</td>
+                <td>@Html.DisplayFor(model => model.ShippingCity)</td>
+                <td>@Html.DisplayFor(model => model.ShippingZIP)</td>
+                <td>@Html.DisplayFor(model => model.ShippingCountry)</td>
+            </tr>
+        </tbody>
+    </table>
+
+
+
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @* @Html.DisplayNameFor(model => model.UserId) *@
+            User
+        </dt>
+        <dd class = "col-sm-10">
+            @* @Html.DisplayFor(model => model.UserId) *@
+            @{
+                var user = await UserManager.FindByIdAsync(Model.UserId);
+            }
+            @user.UserName
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Message)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Message)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Created)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Created)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Total)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Total) €
+        </dd>
+    </dl>
+    <partial name="_OrderItemsPartial" for="@Model.OrderItems" />
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

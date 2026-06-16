@@ -28,5 +28,8 @@ namespace AlgebraWebShop2026.Models
         [Column(TypeName = "decimal(9,2)")]
         public decimal Discount { get; set; } = 0;
 
+        [NotMapped]
+        public string ProductTitle { get; set; }
+
     }
 }

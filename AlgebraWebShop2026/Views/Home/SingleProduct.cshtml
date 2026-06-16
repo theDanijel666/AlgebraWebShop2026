@@ -113,7 +113,7 @@
                 {
                     pc += category.CategoryTitle + ", ";
                 }
-                pc = pc.Substring(0, pc.Length - 2);
+                if(pc.Length>=2) pc = pc.Substring(0, pc.Length - 2);
             }
             <label>@pc</label>
         </dd>

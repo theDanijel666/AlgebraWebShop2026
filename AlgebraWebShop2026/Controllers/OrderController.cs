@@ -52,7 +52,7 @@ namespace AlgebraWebShop2026.Controllers
 
             Order order = HttpContext.Session.GetObjectFromJson<Order>("OrderDetails") ?? new Order();
 
-            if (_signInManager.IsSignedIn(User) && order.BillingFirstname=="")
+            if (_signInManager.IsSignedIn(User) && order.BillingFirstname.IsNullOrEmpty())
             {
                 var userid = _userManager.GetUserId(User);
                 order.UserId = userid;
@@ -136,7 +136,13 @@ namespace AlgebraWebShop2026.Controllers
 
             if(ModelState.IsValid && modelErrors.Count == 0)
             {
-                int orderNum = _context.Order.Max(o => o.OrderNumber)+1;
+                int orderNum = 0;
+                try
+                {
+                    orderNum = _context.Order.Max(o => o.OrderNumber);
+                }
+                catch { }
+                orderNum++;
                 order.OrderNumber= orderNum;
                 order.Created= DateTime.Now;
                 _context.Order.Add(order);
@@ -233,7 +239,10 @@ namespace AlgebraWebShop2026.Controllers
             }
 
             order.OrderItems=_context.OrderItem.Where(o=>o.OrderId==order.Id).ToList();
-
+            foreach (var item in order.OrderItems) 
+            {
+                item.ProductTitle = _context.Product.Find(item.ProductId).Title;
+            }
             return View(order);
         }
     }

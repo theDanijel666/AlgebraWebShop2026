@@ -1,0 +1,66 @@
+@using Microsoft.AspNetCore.Identity
+@model IEnumerable<AlgebraWebShop2026.Models.Order>
+
+@inject UserManager<AlgebraWebShop2026.Data.ApplicationUser> UserManager
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<p>
+    <a asp-action="Create">Create New order</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.OrderNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Created)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Total)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(model => item.Id)
+            </td>
+            <td>
+                @* @Html.DisplayFor(model => item.UserId) *@
+                    @{
+                        var user = await UserManager.FindByIdAsync(item.UserId);
+                    }
+                    @user.UserName
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.OrderNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.Created)
+            </td>
+            <td>
+                @Html.DisplayFor(model => item.Total) €
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a> |
+                <a asp-action="Return" asp-route-id="@item.Id">Refund</a>
+
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

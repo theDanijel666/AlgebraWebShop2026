@@ -17,7 +17,8 @@ namespace AlgebraWebShop2026.Models
 
         [Required]
         [DataType(DataType.DateTime)]
-        [DisplayFormat(DataFormatString ="{0:yyyy-MM-dd}",ApplyFormatInEditMode=true)]
+        [DisplayFormat(DataFormatString ="{0:dd.MM.yyyy HH:mm}",ApplyFormatInEditMode=true)]
+        [Display(Name ="Date and time of order")]
         public DateTime Created {  get; set; }
 
         [Required(ErrorMessage ="Total price is required!")]

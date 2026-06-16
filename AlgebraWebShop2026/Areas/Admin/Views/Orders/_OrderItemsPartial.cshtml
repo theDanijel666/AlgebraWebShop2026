@@ -1,0 +1,28 @@
+﻿@model List<OrderItem>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th> Product </th>
+            <th> Quantity </th>
+            <th> Price </th>
+            <th> Mesuring unit</th>
+            <th> Discount </th>
+            <th> Item Total </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var item in Model)
+        {
+            <tr>
+                <td> <a asp-controller="Home" asp-action="SingleProduct" 
+                    asp-route-id="@item.ProductId"> @item.ProductTitle </a></td>
+                <td> @item.Quantity </td>
+                <td> @item.Price.ToString("0.00") € </td>
+                <td> @item.MesuringUnit </td>
+                <td> @item.Discount.ToString("0.00") % </td>
+                <td> @((item.Price*item.Quantity*(1-item.Discount/100)).ToString("0.00")) € </td>
+            </tr>
+        }
+    </tbody>
+</table>

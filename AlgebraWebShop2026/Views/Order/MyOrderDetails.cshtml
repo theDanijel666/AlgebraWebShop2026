@@ -1,0 +1,181 @@
+﻿@model Order
+@{
+    ViewData["Title"] = "My order details";
+}
+
+<h1> Order details for order no. @Model.OrderNumber</h1>
+
+<div>
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model=>model.Created)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model=>model.Created)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Total)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.Total)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Message)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.Message)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.BillingFirstname)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.BillingFirstname)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.BillingLastname)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.BillingLastname)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.BillingEmail)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.BillingEmail)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.BillingPhone)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.BillingPhone)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.BillingAddress)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.BillingAddress)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.BillingCity)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.BillingCity)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.BillingZIP)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.BillingZIP)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.BillingCountry)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.BillingCountry)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ShippingFirstname)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.ShippingFirstname)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ShippingLastname)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.ShippingLastname)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ShippingEmail)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.ShippingEmail)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ShippingPhone)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.ShippingPhone)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ShippingAddress)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.ShippingAddress)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ShippingCity)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.ShippingCity)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ShippingZIP)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.ShippingZIP)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.ShippingCountry)
+        </dt>
+        <dd class="col-sm-2">
+            @Html.DisplayFor(model => model.ShippingCountry)
+        </dd>
+    </dl>
+    <div class="row">
+        <h4>Order items:</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>
+                        Product
+                    </th>
+                    <th>
+                        Quantity
+                    </th>
+                    <th>
+                        Price
+                    </th>
+                    <th>
+                        Mesuring unit
+                    </th>
+                    <th>
+                        Discount
+                    </th>
+                    <th>
+                        Item total
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(var item in Model.OrderItems)
+                {
+                    <tr>
+                        <td>
+                            <a asp-controller="Home" asp-action="SingleProduct" 
+                                asp-route-id="@item.ProductId"> @item.ProductTitle </a>
+                        </td>
+                        <td>
+                            @item.Quantity
+                        </td>
+                        <td>
+                            @item.Price.ToString("0.00") €
+                        </td>
+                        <td>
+                            @item.MesuringUnit
+                        </td>
+                        <td>
+                            @item.Discount %
+                        </td>
+                        <td>
+                            @((item.Price*item.Quantity*(1-item.Discount/100)).ToString("0.00")) €
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+<div>
+    <a asp-action="MyOrders"> Back to list </a>
+</div>
