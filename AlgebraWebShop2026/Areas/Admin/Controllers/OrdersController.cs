@@ -5,6 +5,7 @@ using AlgebraWebShop2026.Models;
 using AlgebraWebShop2026.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 [Area("Admin")]
 [Authorize(Roles = "Admin")]
@@ -84,6 +85,15 @@ public class OrdersController : Controller
         {
             return NotFound();
         }
+
+        order.OrderItems = await _context.OrderItem.Where(oi => oi.OrderId == id).ToListAsync();
+        foreach(var item in order.OrderItems)
+        {
+            item.ProductTitle = _context.Product.Find(item.ProductId).Title;
+        }
+
+        ViewBag.Users = new SelectList(_userManager.Users, "Id", "UserName");
+
         return View(order);
     }
 
@@ -98,6 +108,14 @@ public class OrdersController : Controller
         {
             return NotFound();
         }
+
+        if (String.IsNullOrEmpty(order.Message))
+        {
+            ModelState.Remove("Message");
+            order.Message = string.Empty;
+        }
+
+        ModelState.Remove("OrderItems");
 
         if (ModelState.IsValid)
         {
@@ -119,6 +137,16 @@ public class OrdersController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
+
+
+        order.OrderItems = await _context.OrderItem.Where(oi => oi.OrderId == id).ToListAsync();
+        foreach (var item in order.OrderItems)
+        {
+            item.ProductTitle = _context.Product.Find(item.ProductId).Title;
+        }
+
+        ViewBag.Users = new SelectList(_userManager.Users, "Id", "UserName");
+
         return View(order);
     }
 
