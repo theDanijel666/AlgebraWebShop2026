@@ -6,6 +6,7 @@ using AlgebraWebShop2026.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.IdentityModel.Tokens;
 
 [Area("Admin")]
 [Authorize(Roles = "Admin")]
@@ -67,14 +68,45 @@ public class OrdersController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("Id,UserId,Message,OrderNumber,Created,Total,BillingFirstname,BillingLastname,BillingEmail,BillingPhone,BillingAddress,BillingCity,BillingZIP,BillingCountry,ShippingFirstname,ShippingLastname,ShippingEmail,ShippingPhone,ShippingAddress,ShippingCity,ShippingZIP,ShippingCountry,OrderItems")] Order order)
+    public async Task<IActionResult> Create([Bind("Id,UserId,Message,OrderNumber,Created,Total,BillingFirstname,BillingLastname,BillingEmail,BillingPhone,BillingAddress,BillingCity,BillingZIP,BillingCountry,ShippingFirstname,ShippingLastname,ShippingEmail,ShippingPhone,ShippingAddress,ShippingCity,ShippingZIP,ShippingCountry,OrderItems")] 
+        Order order, string ShippingSameAsBilling)
     {
+        ModelState.Remove("ShippingSameAsBilling");
+        ModelState.Remove("OrderItems");
+
+        if (order.Message.IsNullOrEmpty()) order.Message = "";
+        ModelState.Remove("Message");
+
+        if (ShippingSameAsBilling == "on")
+        {
+            order.ShippingFirstname = order.BillingFirstname;
+            ModelState.Remove("ShippingFirstname");
+            order.ShippingLastname = order.BillingLastname;
+            ModelState.Remove("ShippingLastname");
+            order.ShippingEmail = order.BillingEmail;
+            ModelState.Remove("ShippingEmail");
+            order.ShippingPhone = order.BillingPhone;
+            ModelState.Remove("ShippingPhone");
+            order.ShippingAddress = order.BillingAddress;
+            ModelState.Remove("ShippingAddress");
+            order.ShippingCity = order.BillingCity;
+            ModelState.Remove("ShippingCity");
+            order.ShippingCountry = order.BillingCountry;
+            ModelState.Remove("ShippingCountry");
+            order.ShippingZIP = order.BillingZIP;
+            ModelState.Remove("ShippingZIP");
+        }
+
         if (ModelState.IsValid)
         {
+            order.OrderNumber = _context.Order.Max(o => o.OrderNumber) + 1;
             _context.Add(order);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+
+            return RedirectToAction(nameof(Index),"OrderItems",new { orderid=order.Id });
         }
+
+        ViewBag.Users = new SelectList(_userManager.Users, "Id", "UserName");
         return View(order);
     }
 
@@ -171,6 +203,12 @@ public class OrdersController : Controller
             return NotFound();
         }
 
+        order.OrderItems = await _context.OrderItem.Where(oi => oi.OrderId == id).ToListAsync();
+        foreach (var item in order.OrderItems)
+        {
+            item.ProductTitle = _context.Product.Find(item.ProductId).Title;
+        }
+
         return View(order);
     }
 
@@ -182,6 +220,13 @@ public class OrdersController : Controller
         var order = await _context.Order.FindAsync(id);
         if (order != null)
         {
+            var orderitems = _context.OrderItem.Where(oi => oi.OrderId == order.Id).ToList();
+            foreach(var item in orderitems) 
+            { 
+                var prod=_context.Product.Find(item.ProductId);
+                prod.Quantity += item.Quantity;
+                _context.Update(prod);
+            }
             _context.Order.Remove(order);
         }
 

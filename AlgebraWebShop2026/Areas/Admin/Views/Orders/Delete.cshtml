@@ -1,4 +1,6 @@
+@using Microsoft.AspNetCore.Identity
 @model AlgebraWebShop2026.Models.Order
+@inject UserManager<AlgebraWebShop2026.Data.ApplicationUser> UserManager
 
 @{
     ViewData["Title"] = "Delete";
@@ -8,32 +10,8 @@
 
 <h3>Are you sure you want to delete this?</h3>
 <div>
-    <h4>AlgebraWebShop2026.Models.Order</h4>
+    <h4>Order no. @Model.Id</h4>
     <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.UserId)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.UserId)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Message)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Message)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OrderNumber)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OrderNumber)
-        </dd>
-    </dl>
     <dl class="row">
         <dt class = "col-sm-2">
             @Html.DisplayNameFor(model => model.Created)
@@ -51,141 +29,20 @@
         </dd>
     </dl>
     <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BillingFirstname)
+        <dt class="col-sm-2">
+            @* @Html.DisplayNameFor(model => model.UserId) *@
+            User
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BillingFirstname)
+        <dd class="col-sm-10">
+            @* @Html.DisplayFor(model => model.UserId) *@
+            @{
+                var user = await UserManager.FindByIdAsync(Model.UserId);
+            }
+            @user.UserName
         </dd>
     </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BillingLastname)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BillingLastname)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BillingEmail)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BillingEmail)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BillingPhone)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BillingPhone)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BillingAddress)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BillingAddress)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BillingCity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BillingCity)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BillingZIP)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BillingZIP)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.BillingCountry)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.BillingCountry)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ShippingFirstname)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ShippingFirstname)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ShippingLastname)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ShippingLastname)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ShippingEmail)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ShippingEmail)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ShippingPhone)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ShippingPhone)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ShippingAddress)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ShippingAddress)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ShippingCity)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ShippingCity)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ShippingZIP)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ShippingZIP)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ShippingCountry)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ShippingCountry)
-        </dd>
-    </dl>
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.OrderItems)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.OrderItems)
-        </dd>
-    </dl>
+    <partial name="_OrderItemsPartial" for="@Model.OrderItems" />
+   
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
