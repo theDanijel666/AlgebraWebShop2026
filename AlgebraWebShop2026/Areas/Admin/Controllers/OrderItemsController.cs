@@ -135,12 +135,30 @@ public class OrderItemsController : Controller
             return NotFound();
         }
 
+        var product = await _context.Product.FindAsync(orderitem.ProductId);
+
+        ModelState.Remove("ProductTitle");
+
         if (ModelState.IsValid)
         {
             try
             {
-                _context.Update(orderitem);
+                var oldOrderItem = await _context.OrderItem.FindAsync(id);
+                var oldquantity = oldOrderItem.Quantity;
+
+                oldOrderItem.Price = orderitem.Price;
+                oldOrderItem.Discount = orderitem.Discount;
+                oldOrderItem.Quantity = orderitem.Quantity;
+                oldOrderItem.MesuringUnit = orderitem.MesuringUnit;
+
+                _context.Update(oldOrderItem);
+
+                product.Quantity -= (orderitem.Quantity - oldquantity);
+                _context.Update(product);
+                //_context.Update(orderitem);
                 await _context.SaveChangesAsync();
+                UpdateOrderTotal(oldOrderItem.OrderId);
+
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -153,8 +171,11 @@ public class OrderItemsController : Controller
                     throw;
                 }
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index),new {orderid=orderitem.OrderId});
         }
+
+        orderitem.ProductTitle = product.Title;
+        ViewBag.QuantityMessage = "Available quantity: " + product.Quantity;
         return View(orderitem);
     }
 
@@ -173,6 +194,8 @@ public class OrderItemsController : Controller
             return NotFound();
         }
 
+        orderitem.ProductTitle = _context.Product.Find(orderitem.ProductId).Title;
+
         return View(orderitem);
     }
 
@@ -185,10 +208,20 @@ public class OrderItemsController : Controller
         if (orderitem != null)
         {
             _context.OrderItem.Remove(orderitem);
+            var product= await _context.Product.FindAsync(orderitem.ProductId);
+            product.Quantity += orderitem.Quantity;
+            _context.Update(product);
+        }
+        else
+        {
+            return RedirectToAction(nameof(Index), "Order");
         }
 
+        int orderid = orderitem.OrderId;
+
         await _context.SaveChangesAsync();
-        return RedirectToAction(nameof(Index));
+        UpdateOrderTotal(orderid);
+        return RedirectToAction(nameof(Index),new {orderid=orderid});
     }
 
     private bool OrderItemExists(int? id)

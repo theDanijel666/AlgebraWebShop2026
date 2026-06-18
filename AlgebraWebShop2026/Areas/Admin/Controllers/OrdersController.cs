@@ -53,7 +53,13 @@ public class OrdersController : Controller
     // GET: ORDERS/Create
     public IActionResult Create()
     {
-        return View();
+        Order order = new Order();
+        order.Created= DateTime.Now;
+        order.Total = 0;
+
+        ViewBag.Users = new SelectList(_userManager.Users, "Id", "UserName");
+
+        return View(order);
     }
 
     // POST: ORDERS/Create
